@@ -1,0 +1,54 @@
+#include "c-phone-numbers.h"
+#include <phonenumbers/phonenumberutil.h>
+#include <stdlib.h>
+#include <cstring>
+#include <string>
+
+using namespace i18n::phonenumbers;
+
+extern "C" void *_c_phone_number_util_get_instance(void) {
+  return PhoneNumberUtil::GetInstance();
+}
+
+extern "C" void *_c_phone_number_ctor() {
+  return new (std::nothrow)PhoneNumber;
+}
+
+extern "C" void *_c_phone_number_dtor(void *phone_no) {
+  delete (PhoneNumber *)phone_no;
+}
+
+extern "C" int _c_phone_number_util_parse(void *util_instance, char *number_str,
+                                          size_t number_len, char *region_str,
+                                          size_t region_len, void *phone_no) {
+  return ((PhoneNumberUtil *)util_instance)
+      ->Parse(std::string(number_str, number_len),
+              std::string(region_str, region_len), (PhoneNumber *)phone_no);
+}
+
+extern "C" bool _c_phone_number_has_country_code(void *phone_no) {
+  return ((PhoneNumber *)phone_no)->has_country_code();
+}
+
+extern "C" bool _c_phone_number_has_national_number(void *phone_no) {
+  return ((PhoneNumber *)phone_no)->has_national_number();
+}
+
+extern "C" bool _c_phone_number_has_extension(void *phone_no) {
+  return ((PhoneNumber *)phone_no)->has_extension();
+}
+extern "C" uint64 _c_phone_number_get_country_code(void *phone_no) {
+  return ((PhoneNumber *)phone_no)->country_code();
+}
+
+extern "C" uint64 _c_phone_number_get_national_number(void *phone_no) {
+  return ((PhoneNumber *)phone_no)->national_number();
+}
+
+// Up to caller to free
+extern "C" char *_c_phone_number_get_extension(void *phone_no) {
+  std::string src = ((PhoneNumber *)phone_no)->extension();
+  char *dst = (char *)malloc(src.length() + 1);
+  std::strcpy(dst, src.c_str());
+  return dst;
+}
