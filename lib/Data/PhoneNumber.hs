@@ -29,7 +29,12 @@ phoneUtilSingleton = unsafePerformIO LowLevel.getPhoneNumberUtil
 {-# NOINLINE phoneUtilSingleton #-}
 
 -- | Try to parse a phone number
-parsePhoneNumber :: ByteString -> ByteString -> Either PhoneNumberParseError PhoneNumber
+parsePhoneNumber
+    :: ByteString
+    -- ^ The phone number to parse
+    -> ByteString
+    -- ^ A two letter country code for the default region to be assumed
+    -> Either PhoneNumberParseError PhoneNumber
 parsePhoneNumber phone_no default_region = do
     let !phone_ref = unsafePerformIO LowLevel.newPhoneNumberRef
     let !r = unsafePerformIO $ LowLevel.parsePhoneNumber phoneUtilSingleton phone_ref phone_no default_region
