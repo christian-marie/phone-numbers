@@ -9,14 +9,15 @@ module Data.PhoneNumber.FFI (
     c_phone_number_dtor,
     c_phone_number_util_get_instance,
     c_phone_number_util_parse,
+    c_phone_number_convert_alpha_characters_in_number,
 
+    -- * Accessors
     c_phone_number_has_country_code,
     c_phone_number_has_national_number,
     c_phone_number_has_extension,
     c_phone_number_get_country_code,
     c_phone_number_get_national_number,
     c_phone_number_get_extension,
-    -- * Accessors
 ) where
 
 import           Foreign.C.String   (CString)
@@ -60,6 +61,14 @@ foreign import ccall unsafe "c-phone-numbers.h _c_phone_number_util_parse"
         -> Ptr PhoneNumberRef
         -- ^ The pointer to write to
         -> IO CInt
+
+
+foreign import ccall unsafe "c-phone-numbers.h _c_phone_number_convert_alpha_characters_in_number"
+    c_phone_number_convert_alpha_characters_in_number
+        :: Ptr PhoneNumberUtil
+        -> CString
+        -> CInt
+        -> IO ()
 
 foreign import ccall unsafe "c-phone-numbers.h _c_phone_number_has_country_code"
     c_phone_number_has_country_code

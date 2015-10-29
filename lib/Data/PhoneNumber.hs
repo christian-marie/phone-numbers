@@ -17,11 +17,14 @@ module Data.PhoneNumber
 
     -- * Parsing
     parsePhoneNumber,
+
+    -- * Utility
+    convertAlphaCharacters,
 ) where
 
 import Data.PhoneNumber.LowLevel(PhoneNumber(..), PhoneNumberParseError(..))
 import qualified Data.PhoneNumber.LowLevel as LowLevel
-import Data.ByteString(ByteString)
+import Data.ByteString(ByteString, copy)
 import System.IO.Unsafe(unsafePerformIO)
 
 phoneUtilSingleton :: LowLevel.PhoneNumberUtil
@@ -39,3 +42,10 @@ parsePhoneNumber phone_no default_region = do
     let !phone_ref = unsafePerformIO LowLevel.newPhoneNumberRef
     let !r = unsafePerformIO $ LowLevel.parsePhoneNumber phoneUtilSingleton phone_ref phone_no default_region
     fmap (\_ -> unsafePerformIO $ LowLevel.copyPhoneNumberRef phone_ref) r
+
+-- | Convert any alpha characters in a phone number to their equivalent keypad
+-- numbers.
+convertAlphaCharacters :: ByteString -> ByteString
+convertAlphaCharacters number =
+    let c = copy number
+    in unsafePerformIO (c <$ LowLevel.unsafeConvertAlphaCharacters phoneUtilSingleton c)

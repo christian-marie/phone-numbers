@@ -11,8 +11,13 @@
 
 import Data.PhoneNumber
 import Control.Monad
+import Data.Monoid
 import qualified Data.ByteString.Char8 as S
 
 main :: IO ()
-main = forever $
-    S.getLine >>= print . flip parsePhoneNumber "AU"
+main = forever $ do
+    l <- S.getLine
+
+    S.putStrLn "Number:"
+    print $ parsePhoneNumber l "AU"
+    S.putStrLn $ "Characters keypad normalised: " <> convertAlphaCharacters l

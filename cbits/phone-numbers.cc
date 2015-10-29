@@ -4,6 +4,8 @@
 #include <cstring>
 #include <string>
 
+#include <iostream>
+
 using namespace i18n::phonenumbers;
 
 extern "C" void *_c_phone_number_util_get_instance(void) {
@@ -11,7 +13,7 @@ extern "C" void *_c_phone_number_util_get_instance(void) {
 }
 
 extern "C" void *_c_phone_number_ctor() {
-  return new (std::nothrow)PhoneNumber;
+  return new (std::nothrow) PhoneNumber;
 }
 
 extern "C" void *_c_phone_number_dtor(void *phone_no) {
@@ -51,4 +53,14 @@ extern "C" char *_c_phone_number_get_extension(void *phone_no) {
   char *dst = (char *)malloc(src.length() + 1);
   std::strcpy(dst, src.c_str());
   return dst;
+}
+
+// Updates in place
+extern "C" void _c_phone_number_convert_alpha_characters_in_number(
+    void *util_instance, char *number_str, size_t number_len) {
+  std::string str(number_str, number_len);
+  ((PhoneNumberUtil *)util_instance)->ConvertAlphaCharactersInNumber(&str);
+  // We have to copy the overwritten data back, now, std::string seems to have
+  // to copy :(
+  std::memcpy(number_str, str.c_str(), number_len);
 }

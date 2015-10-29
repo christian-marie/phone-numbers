@@ -23,6 +23,9 @@ module Data.PhoneNumber.LowLevel
     newPhoneNumberRef,
     parsePhoneNumber,
 
+    -- * Utility
+    unsafeConvertAlphaCharacters,
+
     -- * Extracting usable information
     copyPhoneNumberRef,
 
@@ -36,7 +39,7 @@ import Foreign.ForeignPtr(withForeignPtr, newForeignPtr)
 import Foreign.Ptr(Ptr)
 import Data.Word
 import Data.ByteString(ByteString, useAsCStringLen)
-import Data.ByteString.Unsafe(unsafePackMallocCString)
+import Data.ByteString.Unsafe(unsafePackMallocCString, unsafeUseAsCStringLen)
 import Control.Monad
 
 -- | There was a problem parting your phone number. For now, if you want to
@@ -112,6 +115,15 @@ copyPhoneNumberRef ref =
     PhoneNumber <$> getCountryCode ref
                 <*> getNationalNumber ref
                 <*> getExtension ref
+
+-- | Convert any alpha characters in a phone number to their equivalent keypad
+-- numbers.
+--
+-- This modifies the ByteString in place.
+unsafeConvertAlphaCharacters :: PhoneNumberUtil -> ByteString -> IO ()
+unsafeConvertAlphaCharacters (PhoneNumberUtil util_ptr) number =
+    unsafeUseAsCStringLen number $ \(number_str, fromIntegral -> number_len) ->
+        c_phone_number_convert_alpha_characters_in_number util_ptr number_str number_len
 
 -- * Helpers
 
