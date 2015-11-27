@@ -16,7 +16,7 @@ extern "C" void *_c_phone_number_ctor() {
   return new (std::nothrow) PhoneNumber;
 }
 
-extern "C" void *_c_phone_number_dtor(void *phone_no) {
+extern "C" void _c_phone_number_dtor(void *phone_no) {
   delete (PhoneNumber *)phone_no;
 }
 
