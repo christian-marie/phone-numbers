@@ -20,4 +20,5 @@ main = forever $ do
 
     S.putStrLn "Number:"
     print $ parsePhoneNumber l "AU"
+    print (refType <$> parsePhoneNumberRef l "AU")
     S.putStrLn $ "Characters keypad normalised: " <> convertAlphaCharacters l

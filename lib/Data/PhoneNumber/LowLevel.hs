@@ -15,8 +15,10 @@ module Data.PhoneNumber.LowLevel
 (
     -- * Data types
     PhoneNumber(..),
+    PhoneNumberRef(..),
     PhoneNumberParseError(..),
     PhoneNumberUtil(..),
+    PhoneNumberType,
 
     -- * References and parsing
     getPhoneNumberUtil,
@@ -32,11 +34,12 @@ module Data.PhoneNumber.LowLevel
     getCountryCode,
     getNationalNumber,
     getExtension,
+    getType,
 ) where
 
 import Data.PhoneNumber.FFI
 import Foreign.ForeignPtr(withForeignPtr, newForeignPtr)
-import Foreign.Ptr(Ptr)
+import Foreign.Ptr(nullPtr, Ptr)
 import Data.Word
 import Data.ByteString(ByteString, useAsCStringLen)
 import Data.ByteString.Unsafe(unsafePackMallocCString, unsafeUseAsCStringLen)
@@ -68,7 +71,9 @@ getPhoneNumberUtil =
 newPhoneNumberRef :: IO PhoneNumberRef
 newPhoneNumberRef = do
     ptr <- c_phone_number_ctor
-    PhoneNumberRef <$> newForeignPtr c_phone_number_dtor ptr
+    if nullPtr == ptr
+        then error "c_phone_number_ctor returned null ptr, out of memory?"
+        else PhoneNumberRef <$> newForeignPtr c_phone_number_dtor ptr
 
 -- | Parse a phone number.
 parsePhoneNumber
@@ -108,6 +113,12 @@ getNationalNumber =
 getExtension :: PhoneNumberRef -> IO (Maybe ByteString)
 getExtension =
     maybeFetch c_phone_number_has_extension c_phone_number_get_extension >=> traverse unsafePackMallocCString
+
+getType :: PhoneNumberUtil -> PhoneNumberRef -> IO PhoneNumberType
+getType (PhoneNumberUtil util_ptr) (PhoneNumberRef ref_fptr) =
+    withForeignPtr ref_fptr $ \ref_ptr -> do
+        c_phone_number_get_number_type util_ptr ref_ptr >>= print
+        toEnum . fromIntegral <$> c_phone_number_get_number_type util_ptr ref_ptr
 
 -- | Copy fields from a 'PhoneNumberRef' and create a 'PhoneNumber'
 copyPhoneNumberRef :: PhoneNumberRef -> IO PhoneNumber

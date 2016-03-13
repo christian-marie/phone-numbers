@@ -64,3 +64,9 @@ extern "C" void _c_phone_number_convert_alpha_characters_in_number(
   // to copy :(
   std::memcpy(number_str, str.c_str(), number_len);
 }
+
+extern "C" PhoneNumberType _c_phone_number_util_get_number_type(
+    void *util_instance, void *phone_no) {
+  return (::PhoneNumberType)((PhoneNumberUtil *)util_instance)
+      ->GetNumberType(*((PhoneNumber *)phone_no));
+}

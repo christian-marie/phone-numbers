@@ -3,6 +3,7 @@
 module Data.PhoneNumber.FFI (
     PhoneNumberRef(..),
     PhoneNumberUtil(..),
+    PhoneNumberType(..),
 
     -- * Parsing and utility
     c_phone_number_ctor,
@@ -11,19 +12,22 @@ module Data.PhoneNumber.FFI (
     c_phone_number_util_parse,
     c_phone_number_convert_alpha_characters_in_number,
 
-    -- * Accessors
+    -- * Accessors / metadata
     c_phone_number_has_country_code,
     c_phone_number_has_national_number,
     c_phone_number_has_extension,
     c_phone_number_get_country_code,
     c_phone_number_get_national_number,
     c_phone_number_get_extension,
+    c_phone_number_get_number_type,
 ) where
 
 import           Foreign.C.String   (CString)
 import           Foreign.C.Types    (CInt (..), CULLong (..))
 import           Foreign.ForeignPtr (ForeignPtr)
 import           Foreign.Ptr        (FunPtr, Ptr)
+
+#include "c-phone-numbers.h"
 
 -- | An opaque pointer to a PhoneNumberRef C++ class
 data PhoneNumberRef = PhoneNumberRef { unPhoneNumberRef :: ForeignPtr PhoneNumberRef }
@@ -32,6 +36,8 @@ data PhoneNumberRef = PhoneNumberRef { unPhoneNumberRef :: ForeignPtr PhoneNumbe
 -- | An opaque pointer to the (singleton) PhoneNumberUtil C++ class
 data PhoneNumberUtil = PhoneNumberUtil { unPhoneNumberUtil :: Ptr PhoneNumberUtil }
   deriving Show
+
+{# enum PhoneNumberType as PhoneNumberType {underscoreToCase} deriving (Eq, Show) #}
 
 --  | Create a PhoneNumber opaque pointer
 foreign import ccall unsafe "c-phone-numbers.h _c_phone_number_ctor"
@@ -99,3 +105,9 @@ foreign import ccall unsafe "c-phone-numbers.h _c_phone_number_get_extension"
     c_phone_number_get_extension
         :: Ptr PhoneNumberRef
         -> IO CString
+
+foreign import ccall unsafe "c-phone-numbers.h _c_phone_number_util_get_number_type"
+    c_phone_number_get_number_type
+        :: Ptr PhoneNumberUtil
+        -> Ptr PhoneNumberRef
+        -> IO CInt

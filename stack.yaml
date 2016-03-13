@@ -2,5 +2,5 @@ flags: {}
 packages:
 - '.'
 
-extra-deps:
-resolver: lts-3.7
+extra-deps: []
+resolver: lts-5.2
