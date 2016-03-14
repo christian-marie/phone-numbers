@@ -14,7 +14,7 @@ module Data.PhoneNumber
     -- * Types
     PhoneNumber(..),
     PhoneNumberRef,
-    PhoneNumberType,
+    PhoneNumberType(..),
     PhoneNumberParseError(..),
 
     -- * Parsing
@@ -34,7 +34,8 @@ module Data.PhoneNumber
 import           Data.ByteString           (ByteString, copy)
 import           Data.PhoneNumber.LowLevel (PhoneNumber (..),
                                             PhoneNumberParseError (..),
-                                            PhoneNumberRef, PhoneNumberType)
+                                            PhoneNumberRef,
+                                            PhoneNumberType (..))
 import qualified Data.PhoneNumber.LowLevel as LowLevel
 import           Data.Word                 (Word64)
 import           System.IO.Unsafe          (unsafePerformIO)

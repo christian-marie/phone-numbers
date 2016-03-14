@@ -15,10 +15,10 @@ module Data.PhoneNumber.LowLevel
 (
     -- * Data types
     PhoneNumber(..),
-    PhoneNumberRef(..),
+    PhoneNumberRef,
     PhoneNumberParseError(..),
     PhoneNumberUtil(..),
-    PhoneNumberType,
+    PhoneNumberType(..),
 
     -- * References and parsing
     getPhoneNumberUtil,
@@ -37,13 +37,14 @@ module Data.PhoneNumber.LowLevel
     getType,
 ) where
 
-import Data.PhoneNumber.FFI
-import Foreign.ForeignPtr(withForeignPtr, newForeignPtr)
-import Foreign.Ptr(nullPtr, Ptr)
-import Data.Word
-import Data.ByteString(ByteString, useAsCStringLen)
-import Data.ByteString.Unsafe(unsafePackMallocCString, unsafeUseAsCStringLen)
-import Control.Monad
+import           Control.Monad
+import           Data.ByteString        (ByteString, useAsCStringLen)
+import           Data.ByteString.Unsafe (unsafePackMallocCString,
+                                         unsafeUseAsCStringLen)
+import           Data.PhoneNumber.FFI
+import           Data.Word
+import           Foreign.ForeignPtr     (newForeignPtr, withForeignPtr)
+import           Foreign.Ptr            (Ptr, nullPtr)
 
 -- | There was a problem parting your phone number. For now, if you want to
 -- know what the Int here means, you'll need to look at the ErrorType enum in
@@ -52,7 +53,8 @@ data PhoneNumberParseError = PhoneNumberParseError Int
   deriving (Eq, Show)
 
 -- | A data type representation of a phone number, you can build one of these
--- with copyPhoneNumberRef.
+-- with 'copyPhoneNumberRef' given a 'PhoneNumberRef', which is simply a
+-- convenience for a series of calls to accessors.
 data PhoneNumber =
     PhoneNumber {
         countryCode    :: Maybe Word64,
@@ -80,7 +82,7 @@ parsePhoneNumber
     :: PhoneNumberUtil
     -- ^ The singleton PhoneNumberUtil reference
     -> PhoneNumberRef
-    -- ^ The reference to be mutably updated 
+    -- ^ The reference to be mutably updated
     -> ByteString
     -- ^ The bytestring to parse as a phone number
     -> ByteString
