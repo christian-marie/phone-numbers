@@ -118,8 +118,7 @@ getExtension =
 
 getType :: PhoneNumberUtil -> PhoneNumberRef -> IO PhoneNumberType
 getType (PhoneNumberUtil util_ptr) (PhoneNumberRef ref_fptr) =
-    withForeignPtr ref_fptr $ \ref_ptr -> do
-        c_phone_number_get_number_type util_ptr ref_ptr >>= print
+    withForeignPtr ref_fptr $ \ref_ptr ->
         toEnum . fromIntegral <$> c_phone_number_get_number_type util_ptr ref_ptr
 
 -- | Copy fields from a 'PhoneNumberRef' and create a 'PhoneNumber'
