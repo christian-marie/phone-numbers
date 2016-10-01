@@ -1,0 +1,2 @@
+* Automatically test test example code in README.md
+* Use a sum type for country codes instead of a string

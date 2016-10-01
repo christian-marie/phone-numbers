@@ -1,5 +1,12 @@
+phone-numbers - Parse phone numbers with Google's libphonenumber
+=========================================================
+
+[![Travis Status](http://travis-ci.org/christian-marie/phone-numbers.png?branch=master)](https://travis-ci.org/christian-marie/phone-numbers)
+
+
+```haskell
 --
--- Copyright © 2015 Christian Marie <christian@ponies.io>
+-- Copyright © 2016 Christian Marie <christian@ponies.io>
 --
 -- The code in this file, and the program it is a part of, is
 -- made available to you by its authors as open source software:
@@ -22,3 +29,4 @@ main = forever $ do
     print $ parsePhoneNumber l "AU"
     print (refType <$> parsePhoneNumberRef l "AU")
     S.putStrLn $ "Characters keypad normalised: " <> convertAlphaCharacters l
+```

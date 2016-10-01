@@ -18,6 +18,7 @@ description:
 extra-source-files:
     cbits/*.cc
     include/*.h
+    README.md
 
 library
   hs-source-dirs: lib
