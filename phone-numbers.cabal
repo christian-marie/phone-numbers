@@ -47,3 +47,18 @@ library
 source-repository head
   type:     git
   location: https://github.com/christian-marie/phone-numbers
+
+test-suite test
+  type: exitcode-stdio-1.0
+  build-depends: 
+    base,
+    bytestring,
+    phone-numbers
+
+  ghc-options: -O2  -rtsopts  -threaded 
+  -- we want to check thread-safety of our libphonenumber:
+  ghc-options: -with-rtsopts=-N
+  ghc-options: -fno-ignore-asserts
+  hs-source-dirs: tests
+  main-is: Main.hs
+
