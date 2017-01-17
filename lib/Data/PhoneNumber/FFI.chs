@@ -20,6 +20,9 @@ module Data.PhoneNumber.FFI (
     c_phone_number_get_national_number,
     c_phone_number_get_extension,
     c_phone_number_get_number_type,
+    -- ** Validation
+    c_phone_number_is_possible_number,
+    c_phone_number_is_valid_number,
 ) where
 
 import           Foreign.C.String   (CString)
@@ -111,3 +114,15 @@ foreign import ccall unsafe "c-phone-numbers.h _c_phone_number_util_get_number_t
         :: Ptr PhoneNumberUtil
         -> Ptr PhoneNumberRef
         -> IO CInt
+
+foreign import ccall unsafe "c-phone-numbers.h _c_phone_number_util_is_possible_number"
+    c_phone_number_is_possible_number
+        :: Ptr PhoneNumberUtil
+        -> Ptr PhoneNumberRef
+        -> IO Bool
+
+foreign import ccall unsafe "c-phone-numbers.h _c_phone_number_util_is_valid_number"
+    c_phone_number_is_valid_number
+        :: Ptr PhoneNumberUtil
+        -> Ptr PhoneNumberRef
+        -> IO Bool

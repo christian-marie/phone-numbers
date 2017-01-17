@@ -35,6 +35,8 @@ module Data.PhoneNumber.LowLevel
     getNationalNumber,
     getExtension,
     getType,
+    isPossibleNumber,
+    isValidNumber,
 ) where
 
 import           Control.Monad
@@ -120,6 +122,18 @@ getType :: PhoneNumberUtil -> PhoneNumberRef -> IO PhoneNumberType
 getType (PhoneNumberUtil util_ptr) (PhoneNumberRef ref_fptr) =
     withForeignPtr ref_fptr $ \ref_ptr ->
         toEnum . fromIntegral <$> c_phone_number_get_number_type util_ptr ref_ptr
+
+isPossibleNumber :: PhoneNumberUtil -> PhoneNumberRef -> IO Bool
+isPossibleNumber (PhoneNumberUtil util_ptr) (PhoneNumberRef ref_fptr) =
+    withForeignPtr ref_fptr $ \ref_ptr ->
+        c_phone_number_is_possible_number util_ptr ref_ptr
+
+isValidNumber :: PhoneNumberUtil -> PhoneNumberRef -> IO Bool
+isValidNumber (PhoneNumberUtil util_ptr) (PhoneNumberRef ref_fptr) =
+    withForeignPtr ref_fptr $ \ref_ptr ->
+        c_phone_number_is_valid_number util_ptr ref_ptr
+
+
 
 -- | Copy fields from a 'PhoneNumberRef' and create a 'PhoneNumber'
 copyPhoneNumberRef :: PhoneNumberRef -> IO PhoneNumber

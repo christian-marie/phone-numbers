@@ -26,6 +26,10 @@ module Data.PhoneNumber
     refNationalNumber,
     refExtension,
     refType,
+    -- ** Validation
+    -- | See the libphonenumber javadocs for the distinction between these.
+    refIsPossibleNumber,
+    refIsValidNumber,
 
     -- * Utility
     convertAlphaCharacters,
@@ -87,6 +91,12 @@ refExtension = unsafePerformIO . LowLevel.getExtension
 
 refType :: PhoneNumberRef -> PhoneNumberType
 refType = unsafePerformIO . LowLevel.getType phoneUtilSingleton
+
+refIsPossibleNumber :: PhoneNumberRef -> Bool
+refIsPossibleNumber = unsafePerformIO . LowLevel.isPossibleNumber phoneUtilSingleton
+
+refIsValidNumber :: PhoneNumberRef -> Bool
+refIsValidNumber = unsafePerformIO . LowLevel.isValidNumber phoneUtilSingleton
 
 -- | Convert any alpha characters in a phone number to their equivalent keypad
 -- numbers.

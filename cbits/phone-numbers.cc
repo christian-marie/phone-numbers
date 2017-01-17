@@ -70,3 +70,15 @@ extern "C" PhoneNumberType _c_phone_number_util_get_number_type(
   return (::PhoneNumberType)((PhoneNumberUtil *)util_instance)
       ->GetNumberType(*((PhoneNumber *)phone_no));
 }
+
+extern "C" bool _c_phone_number_util_is_possible_number(
+    void *util_instance, void *phone_no) {
+  return ((PhoneNumberUtil *)util_instance)
+      ->IsPossibleNumber(*((PhoneNumber *)phone_no));
+}
+
+extern "C" bool _c_phone_number_util_is_valid_number(
+    void *util_instance, void *phone_no) {
+  return ((PhoneNumberUtil *)util_instance)
+      ->IsValidNumber(*((PhoneNumber *)phone_no));
+}
