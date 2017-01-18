@@ -12,7 +12,6 @@ import Data.PhoneNumber
 main :: IO ()
 main = do
   threadSafety
-  putStrLn "All tests passed"
 
 threadSafety :: IO ()
 threadSafety = do
@@ -29,10 +28,4 @@ threadSafety = do
   out <- zip phoneWds . sort . take n <$> getChanContents chan
   forM_ out $ \ t@(wdExpected, (wdGot,valid))-> do
     unless (Just wdExpected == wdGot && valid) $
-      error $ "threadSafety failed with: "++(show t)
-
-  isEmpty <- isEmptyChan chan
-  unless isEmpty $
-    error "threadSafety expected chan to be empty!"
-
-  putStrLn "OK"
+      error $ "threadSafety failed with: " ++ show t
