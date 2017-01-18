@@ -26,6 +26,7 @@ module Data.PhoneNumber
     refNationalNumber,
     refExtension,
     refType,
+
     -- ** Validation
     -- | See the libphonenumber javadocs for the distinction between these.
     refIsPossibleNumber,
