@@ -42,6 +42,9 @@ library
     base == 4.*,
     bytestring
 
+  build-tools:
+    c2hs
+
   ghc-options: -Wall
 
 source-repository head
