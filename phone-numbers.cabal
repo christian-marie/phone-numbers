@@ -1,5 +1,5 @@
 name:           phone-numbers
-version:        0.1.0
+version:        0.1.1
 license:        BSD3
 license-file:   LICENSE
 homepage:       https://github.com/christian-marie/phone-numbers
@@ -19,6 +19,7 @@ extra-source-files:
     cbits/*.cc
     include/*.h
     README.md
+    changelog.md
 
 library
   hs-source-dirs: lib
