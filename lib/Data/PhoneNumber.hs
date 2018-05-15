@@ -14,6 +14,7 @@ module Data.PhoneNumber
     -- * Types
     PhoneNumber(..),
     PhoneNumberRef,
+    PhoneNumberFormat(..),
     PhoneNumberType(..),
     PhoneNumberParseError(..),
 
@@ -26,6 +27,7 @@ module Data.PhoneNumber
     refNationalNumber,
     refExtension,
     refType,
+    refFormatted,
 
     -- ** Validation
     -- | See the libphonenumber javadocs for the distinction between these.
@@ -40,7 +42,8 @@ import           Data.ByteString           (ByteString, copy)
 import           Data.PhoneNumber.LowLevel (PhoneNumber (..),
                                             PhoneNumberParseError (..),
                                             PhoneNumberRef,
-                                            PhoneNumberType (..))
+                                            PhoneNumberType (..),
+                                            PhoneNumberFormat (..))
 import qualified Data.PhoneNumber.LowLevel as LowLevel
 import           Data.Word                 (Word64)
 import           System.IO.Unsafe          (unsafePerformIO)
@@ -92,6 +95,9 @@ refExtension = unsafePerformIO . LowLevel.getExtension
 
 refType :: PhoneNumberRef -> PhoneNumberType
 refType = unsafePerformIO . LowLevel.getType phoneUtilSingleton
+
+refFormatted :: PhoneNumberRef -> PhoneNumberFormat -> ByteString
+refFormatted ref format = unsafePerformIO $ LowLevel.getFormatted phoneUtilSingleton ref format
 
 refIsPossibleNumber :: PhoneNumberRef -> Bool
 refIsPossibleNumber = unsafePerformIO . LowLevel.isPossibleNumber phoneUtilSingleton

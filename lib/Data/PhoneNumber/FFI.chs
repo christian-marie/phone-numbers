@@ -4,6 +4,7 @@ module Data.PhoneNumber.FFI (
     PhoneNumberRef(..),
     PhoneNumberUtil(..),
     PhoneNumberType(..),
+    PhoneNumberFormat(..),
 
     -- * Parsing and utility
     c_phone_number_ctor,
@@ -20,6 +21,7 @@ module Data.PhoneNumber.FFI (
     c_phone_number_get_national_number,
     c_phone_number_get_extension,
     c_phone_number_get_number_type,
+    c_phone_number_get_formatted,
     -- ** Validation
     c_phone_number_is_possible_number,
     c_phone_number_is_valid_number,
@@ -41,6 +43,8 @@ data PhoneNumberUtil = PhoneNumberUtil { unPhoneNumberUtil :: Ptr PhoneNumberUti
   deriving Show
 
 {# enum PhoneNumberType as PhoneNumberType {underscoreToCase} deriving (Eq, Show) #}
+
+{# enum PhoneNumberFormat as PhoneNumberFormat {underscoreToCase} deriving (Eq, Show) #}
 
 --  | Create a PhoneNumber opaque pointer
 foreign import ccall unsafe "c-phone-numbers.h _c_phone_number_ctor"
@@ -126,3 +130,10 @@ foreign import ccall unsafe "c-phone-numbers.h _c_phone_number_util_is_valid_num
         :: Ptr PhoneNumberUtil
         -> Ptr PhoneNumberRef
         -> IO Bool
+
+foreign import ccall unsafe "c-phone-numbers.h _c_phone_number_get_formatted"
+    c_phone_number_get_formatted
+        :: Ptr PhoneNumberUtil
+        -> Ptr PhoneNumberRef
+        -> CInt
+        -> IO CString
