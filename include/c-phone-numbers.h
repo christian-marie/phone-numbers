@@ -47,6 +47,13 @@ enum PhoneNumberType {
         UNKNOWN
 };
 
+enum PhoneNumberFormat {
+    E164,
+    INTERNATIONAL,
+    NATIONAL,
+    RFC3966
+};
+
 #ifdef __cplusplus
 extern "C"
 {

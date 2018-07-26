@@ -19,6 +19,7 @@ module Data.PhoneNumber.LowLevel
     PhoneNumberParseError(..),
     PhoneNumberUtil(..),
     PhoneNumberType(..),
+    PhoneNumberFormat(..),
 
     -- * References and parsing
     getPhoneNumberUtil,
@@ -35,6 +36,7 @@ module Data.PhoneNumber.LowLevel
     getNationalNumber,
     getExtension,
     getType,
+    getFormatted,
     isPossibleNumber,
     isValidNumber,
 ) where
@@ -122,6 +124,12 @@ getType :: PhoneNumberUtil -> PhoneNumberRef -> IO PhoneNumberType
 getType (PhoneNumberUtil util_ptr) (PhoneNumberRef ref_fptr) =
     withForeignPtr ref_fptr $ \ref_ptr ->
         toEnum . fromIntegral <$> c_phone_number_get_number_type util_ptr ref_ptr
+
+getFormatted :: PhoneNumberUtil -> PhoneNumberRef -> PhoneNumberFormat -> IO ByteString
+getFormatted (PhoneNumberUtil util_ptr) (PhoneNumberRef ref_fptr) format =
+    withForeignPtr ref_fptr $ \ref_ptr ->
+        c_phone_number_get_formatted util_ptr ref_ptr (fromIntegral $ fromEnum format) >>= unsafePackMallocCString
+
 
 isPossibleNumber :: PhoneNumberUtil -> PhoneNumberRef -> IO Bool
 isPossibleNumber (PhoneNumberUtil util_ptr) (PhoneNumberRef ref_fptr) =

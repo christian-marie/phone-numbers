@@ -55,6 +55,18 @@ extern "C" char *_c_phone_number_get_extension(void *phone_no) {
   return dst;
 }
 
+// Up to caller to free
+extern "C" char *_c_phone_number_get_formatted(void *util_instance, void *phone_no, PhoneNumberFormat format) {
+  std::string src;
+
+  ((PhoneNumberUtil *)util_instance)
+      ->Format(*((PhoneNumber *)phone_no), (i18n::phonenumbers::PhoneNumberUtil::PhoneNumberFormat)format, &src);
+
+  char *dst = (char *)malloc(src.length() + 1);
+  std::strcpy(dst, src.c_str());
+  return dst;
+}
+
 // Updates in place
 extern "C" void _c_phone_number_convert_alpha_characters_in_number(
     void *util_instance, char *number_str, size_t number_len) {
