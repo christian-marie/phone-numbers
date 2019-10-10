@@ -54,6 +54,15 @@ enum PhoneNumberFormat {
     RFC3966
 };
 
+enum ErrorType {
+                NO_PARSING_ERROR,
+                INVALID_COUNTRY_CODE_ERROR,  // INVALID_COUNTRY_CODE in the java version.
+                NOT_A_NUMBER,
+                TOO_SHORT_AFTER_IDD,
+                TOO_SHORT_NSN,
+                TOO_LONG_NSN,  // TOO_LONG in the java version.
+};
+
 #ifdef __cplusplus
 extern "C"
 {
