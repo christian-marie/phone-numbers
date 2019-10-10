@@ -47,7 +47,7 @@ data PhoneNumberUtil = PhoneNumberUtil { unPhoneNumberUtil :: Ptr PhoneNumberUti
 
 {# enum PhoneNumberFormat as PhoneNumberFormat {underscoreToCase} deriving (Eq, Show) #}
 
-{# enum ErrorType as PhoneNumberParseError {underscoreToCase} deriving (Eq, Show) #}
+{# enum ErrorType as PhoneNumberParseError {underscoreToCase} omit (NO_PARSING_ERROR) deriving (Eq, Show) #}
 
 --  | Create a PhoneNumber opaque pointer
 foreign import ccall unsafe "c-phone-numbers.h _c_phone_number_ctor"

@@ -92,9 +92,9 @@ parsePhoneNumber (PhoneNumberUtil util_ptr) (PhoneNumberRef f_ptr) number region
     useAsCStringLen region $ \(region_str, fromIntegral -> region_len) -> do
     retco <- withForeignPtr f_ptr $
         c_phone_number_util_parse util_ptr number_str number_len region_str region_len
-    return $ case toEnum . fromIntegral $ retco of
-      NoParsingError -> Right ()
-      err -> Left err
+    return $ case fromIntegral $ retco of
+      0 -> Right ()
+      err -> Left . toEnum $ err - 1
 
 -- | Read the country code from a PhoneNumberRef
 getCountryCode :: PhoneNumberRef -> IO (Maybe Word64)
