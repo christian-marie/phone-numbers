@@ -47,7 +47,6 @@ library
     c2hs
 
   ghc-options: -Wall
-  ghc-options: -optc-std=c++14
   cc-options:  -std=c++14
   
 source-repository head
