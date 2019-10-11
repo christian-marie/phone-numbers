@@ -3,4 +3,7 @@ packages:
 - '.'
 
 extra-deps: []
-resolver: lts-9.0
+resolver: lts-14.8
+
+nix:
+  packages: [ libphonenumber, protobuf ]
