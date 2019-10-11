@@ -50,12 +50,6 @@ import           Data.Word
 import           Foreign.ForeignPtr     (newForeignPtr, withForeignPtr)
 import           Foreign.Ptr            (Ptr, nullPtr)
 
--- | There was a problem parting your phone number. For now, if you want to
--- know what the Int here means, you'll need to look at the ErrorType enum in
--- the underlying library.
-data PhoneNumberParseError = PhoneNumberParseError Int
-  deriving (Eq, Show)
-
 -- | A data type representation of a phone number, you can build one of these
 -- with 'copyPhoneNumberRef' given a 'PhoneNumberRef', which is simply a
 -- convenience for a series of calls to accessors.
@@ -95,15 +89,12 @@ parsePhoneNumber
     -> IO (Either PhoneNumberParseError ())
 parsePhoneNumber (PhoneNumberUtil util_ptr) (PhoneNumberRef f_ptr) number region =
     useAsCStringLen number $ \(number_str, fromIntegral -> number_len) ->
-    useAsCStringLen region $ \(region_str, fromIntegral -> region_len) ->
-    withForeignPtr f_ptr $ \ptr -> do
-        e <- c_phone_number_util_parse util_ptr number_str number_len region_str region_len ptr
-        return $ checkError (fromIntegral e)
-  where
-    -- TODO: This is actually a an ErrorType enum, we could translate errors to
-    -- more useful ones.
-    checkError 0 = Right ()
-    checkError e = Left $ PhoneNumberParseError e
+    useAsCStringLen region $ \(region_str, fromIntegral -> region_len) -> do
+    retco <- withForeignPtr f_ptr $
+        c_phone_number_util_parse util_ptr number_str number_len region_str region_len
+    return $ case fromIntegral $ retco of
+      0 -> Right ()
+      err -> Left . toEnum $ err - 1
 
 -- | Read the country code from a PhoneNumberRef
 getCountryCode :: PhoneNumberRef -> IO (Maybe Word64)
