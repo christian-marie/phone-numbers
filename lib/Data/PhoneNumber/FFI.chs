@@ -6,12 +6,14 @@ module Data.PhoneNumber.FFI (
     PhoneNumberType(..),
     PhoneNumberFormat(..),
     PhoneNumberParseError(..),
+    CountryCodeSource(..),
 
     -- * Parsing and utility
     c_phone_number_ctor,
     c_phone_number_dtor,
     c_phone_number_util_get_instance,
     c_phone_number_util_parse,
+    c_phone_number_util_parse_and_keep_raw_input,
     c_phone_number_convert_alpha_characters_in_number,
 
     -- * Accessors / metadata
@@ -23,6 +25,7 @@ module Data.PhoneNumber.FFI (
     c_phone_number_get_extension,
     c_phone_number_get_number_type,
     c_phone_number_get_formatted,
+    c_phone_number_get_country_code_source,
     -- ** Validation
     c_phone_number_is_possible_number,
     c_phone_number_is_valid_number,
@@ -48,6 +51,8 @@ data PhoneNumberUtil = PhoneNumberUtil { unPhoneNumberUtil :: Ptr PhoneNumberUti
 {# enum PhoneNumberFormat as PhoneNumberFormat {underscoreToCase} deriving (Eq, Show) #}
 
 {# enum ErrorType as PhoneNumberParseError {underscoreToCase} omit (NO_PARSING_ERROR) deriving (Eq, Show) #}
+
+{# enum CountryCodeSource as CountryCodeSource {underscoreToCase} deriving (Eq, Show) #}
 
 --  | Create a PhoneNumber opaque pointer
 foreign import ccall unsafe "c-phone-numbers.h _c_phone_number_ctor"
@@ -78,6 +83,19 @@ foreign import ccall unsafe "c-phone-numbers.h _c_phone_number_util_parse"
         -- ^ The pointer to write to
         -> IO CInt
 
+-- | Call a C wrapper to parse a phone number with explicit length strings
+foreign import ccall unsafe "c-phone-numbers.h _c_phone_number_util_parse_and_keep_raw_input"
+    c_phone_number_util_parse_and_keep_raw_input
+        :: Ptr PhoneNumberUtil
+        -> CString
+        -> CInt
+        -- ^ The phone number
+        -> CString
+        -> CInt
+        -- ^ The region code (AU, US, etc)
+        -> Ptr PhoneNumberRef
+        -- ^ The pointer to write to
+        -> IO CInt
 
 foreign import ccall unsafe "c-phone-numbers.h _c_phone_number_convert_alpha_characters_in_number"
     c_phone_number_convert_alpha_characters_in_number
@@ -140,3 +158,8 @@ foreign import ccall unsafe "c-phone-numbers.h _c_phone_number_get_formatted"
         -> Ptr PhoneNumberRef
         -> CInt
         -> IO CString
+
+foreign import ccall unsafe "c-phone-numbers.h _c_phone_number_get_country_code_source"
+    c_phone_number_get_country_code_source
+        :: Ptr PhoneNumberRef
+        -> IO CInt

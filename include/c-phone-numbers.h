@@ -63,6 +63,14 @@ enum ErrorType {
                 TOO_LONG_NSN,  // TOO_LONG in the java version.
 };
 
+enum CountryCodeSource {
+    UNSPECIFIED,
+    FROM_NUMBER_WITH_PLUS_SIGN,
+    FROM_NUMBER_WITH_IDD,
+    FROM_NUMBER_WITHOUT_PLUS_SIGN,
+    FROM_DEFAULT_COUNTRY,
+};
+
 #ifdef __cplusplus
 extern "C"
 {
