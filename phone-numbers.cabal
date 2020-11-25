@@ -1,6 +1,7 @@
+cabal-version:  2.2
 name:           phone-numbers
 version:        0.2.0
-license:        BSD3
+license:        BSD-3-Clause
 license-file:   LICENSE
 homepage:       https://github.com/christian-marie/phone-numbers
 bug-reports:    https://github.com/christian-marie/phone-numbers
@@ -9,7 +10,6 @@ author:         Christian Marie <christian@ponies.io>
 maintainer:     Christian Marie <christian@ponies.io>
 stability:      experimental
 synopsis:       Haskell bindings to the libphonenumber library
-cabal-version:  >= 1.8
 build-type:     Simple
 description:
     Basic phone number parsing, largely incomplete, please submit a pull
@@ -24,7 +24,7 @@ extra-source-files:
 library
   hs-source-dirs: lib
 
-  c-sources:
+  cxx-sources:
     cbits/phone-numbers.cc
 
   extra-libraries: phonenumber, stdc++, protobuf
@@ -47,7 +47,7 @@ library
     c2hs
 
   ghc-options: -Wall
-  cc-options:  -std=c++14
+  cxx-options:  -std=c++14
   
 source-repository head
   type:     git

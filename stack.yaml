@@ -3,7 +3,7 @@ packages:
 - '.'
 
 extra-deps: []
-resolver: lts-14.8
+resolver: nightly-2020-11-23
 
 nix:
   packages: [ libphonenumber, protobuf ]
