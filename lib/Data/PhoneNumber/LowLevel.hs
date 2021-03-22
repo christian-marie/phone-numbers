@@ -20,11 +20,13 @@ module Data.PhoneNumber.LowLevel
     PhoneNumberUtil(..),
     PhoneNumberType(..),
     PhoneNumberFormat(..),
+    CountryCodeSource(..),
 
     -- * References and parsing
     getPhoneNumberUtil,
     newPhoneNumberRef,
     parsePhoneNumber,
+    parsePhoneNumberAndKeepRawInput,
 
     -- * Utility
     unsafeConvertAlphaCharacters,
@@ -32,6 +34,7 @@ module Data.PhoneNumber.LowLevel
     -- * Extracting usable information
     copyPhoneNumberRef,
 
+    countryCodeSource,
     getCountryCode,
     getNationalNumber,
     getExtension,
@@ -49,6 +52,7 @@ import           Data.PhoneNumber.FFI
 import           Data.Word
 import           Foreign.ForeignPtr     (newForeignPtr, withForeignPtr)
 import           Foreign.Ptr            (Ptr, nullPtr)
+import           Foreign.C.Types
 
 -- | A data type representation of a phone number, you can build one of these
 -- with 'copyPhoneNumberRef' given a 'PhoneNumberRef', which is simply a
@@ -75,6 +79,22 @@ newPhoneNumberRef = do
         then error "c_phone_number_ctor returned null ptr, out of memory?"
         else PhoneNumberRef <$> newForeignPtr c_phone_number_dtor ptr
 
+callParser
+    :: (Ptr PhoneNumberUtil -> Ptr CChar -> CInt -> Ptr CChar -> CInt -> Ptr PhoneNumberRef -> IO CInt)
+    -> PhoneNumberUtil
+    -> PhoneNumberRef
+    -> ByteString
+    -> ByteString
+    -> IO (Either PhoneNumberParseError ())
+callParser f (PhoneNumberUtil util_ptr) (PhoneNumberRef f_ptr) number region =
+    useAsCStringLen number $ \(number_str, fromIntegral -> number_len) ->
+    useAsCStringLen region $ \(region_str, fromIntegral -> region_len) -> do
+    retco <- withForeignPtr f_ptr $
+        f util_ptr number_str number_len region_str region_len
+    return $ case fromIntegral $ retco of
+      0 -> Right ()
+      err -> Left . toEnum $ err - 1
+
 -- | Parse a phone number.
 parsePhoneNumber
     :: PhoneNumberUtil
@@ -87,14 +107,21 @@ parsePhoneNumber
     -- ^ The default region to assume numbers are from, if ambiguous. e.g. "AU"
     -- for Australia
     -> IO (Either PhoneNumberParseError ())
-parsePhoneNumber (PhoneNumberUtil util_ptr) (PhoneNumberRef f_ptr) number region =
-    useAsCStringLen number $ \(number_str, fromIntegral -> number_len) ->
-    useAsCStringLen region $ \(region_str, fromIntegral -> region_len) -> do
-    retco <- withForeignPtr f_ptr $
-        c_phone_number_util_parse util_ptr number_str number_len region_str region_len
-    return $ case fromIntegral $ retco of
-      0 -> Right ()
-      err -> Left . toEnum $ err - 1
+parsePhoneNumber = callParser c_phone_number_util_parse
+
+-- | Parse a phone number, populating non-essential metadata fields.
+parsePhoneNumberAndKeepRawInput
+    :: PhoneNumberUtil
+    -- ^ The singleton PhoneNumberUtil reference
+    -> PhoneNumberRef
+    -- ^ The reference to be mutably updated
+    -> ByteString
+    -- ^ The bytestring to parse as a phone number
+    -> ByteString
+    -- ^ The default region to assume numbers are from, if ambiguous. e.g. "AU"
+    -- for Australia
+    -> IO (Either PhoneNumberParseError ())
+parsePhoneNumberAndKeepRawInput = callParser c_phone_number_util_parse_and_keep_raw_input
 
 -- | Read the country code from a PhoneNumberRef
 getCountryCode :: PhoneNumberRef -> IO (Maybe Word64)
@@ -161,3 +188,8 @@ maybeFetch p f (PhoneNumberRef f_ptr) =
         if r
             then Just <$> f ptr
             else return Nothing
+
+countryCodeSource :: PhoneNumberRef -> IO CountryCodeSource
+countryCodeSource (PhoneNumberRef ref_fptr) =
+    withForeignPtr ref_fptr $ \ref_ptr ->
+        toEnum . fromIntegral <$> c_phone_number_get_country_code_source ref_ptr

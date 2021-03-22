@@ -17,12 +17,15 @@ module Data.PhoneNumber
     PhoneNumberFormat(..),
     PhoneNumberType(..),
     PhoneNumberParseError(..),
+    CountryCodeSource(..),
 
     -- * Parsing
     parsePhoneNumber,
     parsePhoneNumberRef,
+    parsePhoneNumberAndKeepRawInputRef,
 
     -- * PhoneNumberRef accessors/utilities
+    refCountryCodeSource,
     refCountryCode,
     refNationalNumber,
     refExtension,
@@ -43,7 +46,8 @@ import           Data.PhoneNumber.LowLevel (PhoneNumber (..),
                                             PhoneNumberParseError (..),
                                             PhoneNumberRef,
                                             PhoneNumberType (..),
-                                            PhoneNumberFormat (..))
+                                            PhoneNumberFormat (..),
+                                            CountryCodeSource (..))
 import qualified Data.PhoneNumber.LowLevel as LowLevel
 import           Data.Word                 (Word64)
 import           System.IO.Unsafe          (unsafePerformIO)
@@ -83,6 +87,19 @@ parsePhoneNumberRef phone_no default_region = unsafePerformIO $ do
     r <- LowLevel.parsePhoneNumber phoneUtilSingleton phone_ref phone_no default_region
     return $ phone_ref <$ r
 
+-- | Same as parsePhoneNumberRef, but keeps extra metadata, such as
+-- CountryCodeSource.
+parsePhoneNumberAndKeepRawInputRef
+    :: ByteString
+    -- ^ The phone number to parse
+    -> ByteString
+    -- ^ A two letter country code for the default region to be assumed
+    -> Either PhoneNumberParseError PhoneNumberRef
+parsePhoneNumberAndKeepRawInputRef phone_no default_region = unsafePerformIO $ do
+    phone_ref <- LowLevel.newPhoneNumberRef
+    r <- LowLevel.parsePhoneNumberAndKeepRawInput phoneUtilSingleton phone_ref phone_no default_region
+    return $ phone_ref <$ r
+
 refCountryCode :: PhoneNumberRef -> Maybe Word64
 refCountryCode = unsafePerformIO . LowLevel.getCountryCode
 
@@ -111,3 +128,7 @@ convertAlphaCharacters :: ByteString -> ByteString
 convertAlphaCharacters number =
     let c = copy number
     in unsafePerformIO (c <$ LowLevel.unsafeConvertAlphaCharacters phoneUtilSingleton c)
+
+-- | Requires PhoneNumberRef to be parsed with 'parsePhoneNumberAndKeepRawInputRef'
+refCountryCodeSource :: PhoneNumberRef -> LowLevel.CountryCodeSource
+refCountryCodeSource = unsafePerformIO . LowLevel.countryCodeSource

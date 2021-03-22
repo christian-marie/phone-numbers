@@ -28,6 +28,14 @@ extern "C" int _c_phone_number_util_parse(void *util_instance, char *number_str,
               std::string(region_str, region_len), (PhoneNumber *)phone_no);
 }
 
+extern "C" int _c_phone_number_util_parse_and_keep_raw_input(void *util_instance, char *number_str,
+                                          size_t number_len, char *region_str,
+                                          size_t region_len, void *phone_no) {
+  return ((PhoneNumberUtil *)util_instance)
+      ->ParseAndKeepRawInput(std::string(number_str, number_len),
+              std::string(region_str, region_len), (PhoneNumber *)phone_no);
+}
+
 extern "C" bool _c_phone_number_has_country_code(void *phone_no) {
   return ((PhoneNumber *)phone_no)->has_country_code();
 }
@@ -93,4 +101,18 @@ extern "C" bool _c_phone_number_util_is_valid_number(
     void *util_instance, void *phone_no) {
   return ((PhoneNumberUtil *)util_instance)
       ->IsValidNumber(*((PhoneNumber *)phone_no));
+}
+
+// The CountryCodeSource enum comes from phonenumber.proto
+// so we need to convert it manually
+extern "C" int _c_phone_number_get_country_code_source(
+    void *phone_no) {
+  switch (((PhoneNumber *)phone_no)->country_code_source()) {
+    case PhoneNumber::FROM_NUMBER_WITH_PLUS_SIGN: return FROM_NUMBER_WITH_PLUS_SIGN;
+    case PhoneNumber::FROM_NUMBER_WITH_IDD: return FROM_NUMBER_WITH_IDD;
+    case PhoneNumber::FROM_NUMBER_WITHOUT_PLUS_SIGN: return FROM_NUMBER_WITHOUT_PLUS_SIGN;
+    case PhoneNumber::FROM_DEFAULT_COUNTRY: return FROM_DEFAULT_COUNTRY;
+    case PhoneNumber::UNSPECIFIED: 
+    default: return UNSPECIFIED;
+  }
 }
