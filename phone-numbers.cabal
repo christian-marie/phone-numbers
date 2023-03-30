@@ -47,7 +47,7 @@ library
     c2hs
 
   ghc-options: -Wall
-  cxx-options:  -std=c++14
+  cxx-options:  -std=c++17
   
 source-repository head
   type:     git
